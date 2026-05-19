@@ -128,8 +128,8 @@ Entre os principais objetivos do sistema estão:
 
 ###
 
-<p align="left">🌐https://arthurneiva017.github.io/Plataforma-Cyber-Threat-Hub/
-<img src=""  />
+<Strong font-size="80%"><b>[🌐Site da Plataforma Cyber Threat Hub](https://arthurneiva017.github.io/Plataforma-Cyber-Threat-Hub)</b></Strong><br><br>
+<img src="Imagens/Design sem nome.png" width="40%" />
 </div>
 
 
