@@ -124,6 +124,15 @@ Entre os principais objetivos do sistema estão:
 
 ###
 
+<h2 align="left">💻Acessar Plataforma</h2>
+
+###
+
+<p align="left">🌐https://arthurneiva017.github.io/Plataforma-Cyber-Threat-Hub/
+<img src=""  />
+</div>
+
+
 <h2 align="left">👥Colaboradores do Projeto</h2>
 
 | Membro                | Papel                                      |
@@ -141,6 +150,8 @@ Entre os principais objetivos do sistema estão:
 </div>
 
 ###
+
+
 
 ### 📈 Status do Projeto
 #### 🚧 Em andamento
