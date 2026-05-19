@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber Threat Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-color: #121413;
+      --panel-bg: #1c1e1d;
+      --border-color: #2b2f2d;
+      --text-bright: #EFF1F2;
+      --text-muted: #D1D2D5;
+      --accent: #ff0000;
+      --accent-hover: #ff0000;
+      --success: #23C35F;
+      --warning: #d29922;
+      --danger: #f85149;
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-color);
+      color: var(--text-bright);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background-color: var(--panel-bg);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--border-color);
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    .sidebar-header i {
+      color: var(--accent);
+      margin-right: 10px;
+      font-size: 1.2rem;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: 6px;
+      transition: all 0.2s;
+      border-left: 4px solid transparent;
+      cursor: pointer;
+    }
+
+    .nav-item i { width: 20px; margin-right: 12px; }
+
+    .nav-item:hover {
+      background-color: var(--border-color);
+      color: var(--text-bright);
+    }
+
+    .nav-item.active {
+      background-color: rgba(88, 166, 255, 0.1);
+      color: var(--accent);
+      border-left-color: var(--accent);
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* Main */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .topbar {
+      height: 64px;
+      background-color: var(--panel-bg);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      flex-shrink: 0;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      background-color: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 6px 12px;
+    }
+
+    .search-box i { color: var(--text-muted); font-size: 0.85rem; margin-right: 8px; }
+
+    .search-box input {
+      background: transparent;
+      border: none;
+      color: var(--text-bright);
+      outline: none;
+      width: 200px;
+      font-family: inherit;
+      font-size: 0.85rem;
+    }
+
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--danger);
+      border-radius: 50%;
+      margin-right: 6px;
+      box-shadow: 0 0 5px var(--danger);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(248,81,73,0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(248,81,73,0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(248,81,73,0); }
+    }
+
+    .icon-btn {
+      position: relative;
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon-btn:hover { color: var(--text-bright); background-color: var(--bg-color); }
+
+    .icon-btn.primary {
+      background-color: #c32323;
+      color: white;
+      border-color: #c32323;
+    }
+
+    .badge-dot {
+      position: absolute;
+      top: 6px; right: 6px;
+      width: 6px; height: 6px;
+      background-color: var(--danger);
+      border-radius: 50%;
+    }
+
+    /* Content Area */
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      position: relative;
+    }
+
+    .view { display: none; animation: fadeIn 0.3s ease; }
+    .view.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 { margin-bottom: 8px; }
+    .text-muted { color: var(--text-muted); font-size: 0.875rem; }
+
+    /* BR Banner */
+    .br-banner {
+      display: flex;
+      align-items: center;
+      background-color: rgba(26,12,12,0.95);
+      border: 1px solid var(--danger);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(248,81,73,0.15);
+    }
+
+    .br-banner-icon { font-size: 1.5rem; color: var(--danger); margin-right: 16px; }
+    .br-banner-content { flex: 1; }
+    .br-banner-title { color: var(--danger); font-size: 1.05rem; margin-bottom: 6px; font-weight: 600; }
+    .br-banner-desc { color: var(--text-bright); font-size: 0.9rem; line-height: 1.4; margin-bottom: 8px; }
+    .br-banner-link { color: var(--danger); font-size: 0.85rem; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
+    .br-banner-close { background: transparent; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; margin-left: 16px; align-self: flex-start; }
+    .br-banner-close:hover { color: var(--text-bright); }
+
+    /* Dashboard Cards */
+    .grid-cards-new {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .stat-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .stat-card-title { font-size: 0.8rem; color: var(--text-muted); }
+    .stat-card-value { font-size: 2.2rem; font-weight: 700; color: var(--text-bright); margin-bottom: 4px; margin-top: 6px; }
+
+    /* Charts */
+    .grid-charts-top {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .chart-container {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .chart-header {
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      font-size: 1.125rem;
+      font-weight: 600;
+    }
+
+    .chart-wrapper { position: relative; height: 250px; width: 100%; }
+
+    /* Tables */
+    .dashboard-tables-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .table-container {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      overflow-x: auto;
+    }
+
+    .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .data-table th { text-align: left; color: var(--text-muted); font-weight: 500; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); }
+    .data-table td { padding: 16px 0; border-bottom: 1px solid var(--border-color); color: var(--text-bright); }
+    .data-table tr:last-child td { border-bottom: none; padding-bottom: 0; }
+
+    .vuln-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; }
+    .vuln-item:last-child { border-bottom: none; }
+
+    /* Badge */
+    .badge { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; background-color: rgba(255,255,255,0.1); }
+    .badge.danger { background-color: rgba(248,81,73,0.2); color: var(--danger); border: 1px solid var(--danger); }
+    .badge.warning { background-color: rgba(210,153,34,0.2); color: var(--warning); border: 1px solid var(--warning); }
+    .badge.neutral { background-color: rgba(139,148,158,0.2); color: var(--text-muted); border: 1px solid var(--text-muted); }
+
+    /* Controls Bar */
+    .controls-bar { display: flex; gap: 16px; margin-top: 24px; margin-bottom: 0; }
+
+    .input-field {
+      background-color: #0d1117;
+      border: 1px solid var(--border-color);
+      color: var(--text-bright);
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-family: inherit;
+      width: 300px;
+    }
+
+    .input-field:focus { outline: none; border-color: var(--accent); }
+
+    /* News Grid */
+    .grid-news {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    /* List Items */
+    .data-list { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
+
+    .list-item {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .list-item:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(236,41,41,0.3), 0 2px 8px rgba(234,7,7,0.2);
+    }
+
+    .list-item h3 { font-size: 1.1rem; color: #e2e8f0; font-weight: 600; margin-bottom: 12px; }
+
+    .item-meta { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .item-meta .source { color: var(--accent); font-weight: 500; }
+    .item-desc { color: #a0aec0; font-size: 0.9rem; line-height: 1.6; margin-bottom: auto; }
+    .item-header { display: flex; justify-content: space-between; margin-bottom: 12px; }
+    .item-date { font-size: 0.875rem; color: var(--text-muted); }
+    .item-footer { display: flex; gap: 8px; margin-top: 20px; }
+
+    .read-more {
+      margin-top: 20px;
+      color: var(--accent);
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+
+    /* Side Panel */
+    .side-panel {
+      position: fixed;
+      top: 0; right: -500px;
+      width: 500px;
+      height: 100vh;
+      background-color: var(--panel-bg);
+      border-left: 1px solid var(--border-color);
+      box-shadow: -5px 0 25px rgba(0,0,0,0.5);
+      transition: right 0.3s ease;
+      z-index: 1000;
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    .side-panel.open { right: 0; }
+
+    .close-btn {
+      position: absolute;
+      top: 20px; right: 20px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .close-btn:hover { color: white; }
+
+    .panel-title { font-size: 1.25rem; font-weight: bold; margin-bottom: 10px; margin-top: 20px; line-height: 1.4; }
+
+    .ai-summary {
+      background: linear-gradient(145deg, rgba(88,166,255,0.1) 0%, rgba(163,113,247,0.1) 100%);
+      border: 1px solid rgba(163,113,247,0.3);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+    }
+
+    .ai-summary h4 { color: #a371f7; display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.9rem; }
+
+    .btn-primary {
+      display: inline-block;
+      background-color: var(--accent);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 500;
+      text-align: center;
+      width: 100%;
+      margin-top: 20px;
+      transition: opacity 0.2s;
+    }
+
+    .btn-primary:hover { opacity: 0.9; }
+
+    /* Notification Dropdown */
+    .notification-dropdown { position: relative; }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%; right: 0;
+      margin-top: 8px;
+      width: 350px;
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      display: none;
+      flex-direction: column;
+      z-index: 100;
+    }
+
+    .notification-dropdown.open .dropdown-menu { display: flex; }
+
+    .dropdown-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .clear-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; }
+    .clear-btn:hover { color: var(--danger); }
+
+    .dropdown-list { max-height: 350px; overflow-y: auto; }
+
+    .notif-item {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      gap: 12px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .notif-item:hover { background-color: rgba(255,255,255,0.05); }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-icon { color: var(--danger); font-size: 1.2rem; margin-top: 2px; }
+    .notif-content h5 { color: var(--danger); font-size: 0.9rem; margin-bottom: 4px; }
+    .notif-content p { color: var(--text-bright); font-size: 0.8rem; line-height: 1.3; margin-bottom: 4px; }
+    .notif-time { color: var(--text-muted); font-size: 0.75rem; }
+
+    /* Loader */
+    .loader { display: none; align-items: center; justify-content: center; padding: 40px; }
+    .loader.active { display: flex; }
+    .loader-spinner {
+      width: 40px; height: 40px;
+      border: 4px solid var(--border-color);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-color); }
+    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #444; }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <i class="fa-solid fa-cloud"></i>
+      <span>Cyber Threat Hub</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item active" data-target="view-dashboard">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>Dashboard</span>
+      </a>
+      <a class="nav-item" data-target="view-news">
+        <i class="fa-regular fa-newspaper"></i>
+        <span>CyberSec News</span>
+      </a>
+      <a class="nav-item" data-target="view-threats">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>Threat Feed</span>
+      </a>
+      <a class="nav-item" data-target="view-cves">
+        <i class="fa-solid fa-shield-virus"></i>
+        <span>Vulnerabilidades</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <p>Cyber Threat Hub v1.0.0</p>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-wrapper">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-title"></div>
+      <div class="topbar-actions">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" placeholder="Pesquisar..." id="global-search">
+        </div>
+        <div class="live-indicator">
+          <span class="live-dot"></span> AO VIVO
+        </div>
+        <div class="notification-dropdown" id="notif-dropdown">
+          <button class="icon-btn" id="bell-btn">
+            <i class="fa-regular fa-bell"></i>
+            <span class="badge-dot" id="bell-badge"></span>
+          </button>
+          <div class="dropdown-menu" id="notif-menu">
+            <div class="dropdown-header">
+              <span>Notificações</span>
+              <button id="clear-notifs" class="clear-btn" title="Limpar todas"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+            <div class="dropdown-list" id="notif-list">
+              <!-- populated by JS -->
+            </div>
+          </div>
+        </div>
+        <button class="icon-btn"><i class="fa-solid fa-gear"></i></button>
+        <button class="icon-btn primary"><i class="fa-regular fa-user"></i></button>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <div class="content-area">
+
+      <div id="global-loader" class="loader">
+        <div class="loader-spinner"></div>
+      </div>
+
+      <!-- View: Dashboard -->
+      <section id="view-dashboard" class="view active">
+        <!-- BR Threat Banner -->
+        <div id="br-threat-banner" class="br-banner">
+          <div class="br-banner-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div class="br-banner-content">
+            <h4 class="br-banner-title">🚨 Alerta Crítico: Nova ameaça detectada no Brasil</h4>
+            <p class="br-banner-desc">Vítima: Saúde Digital S.A. | Grupo: LockBit 3.0. Verifique o Painel de Ameaças para mais informações.</p>
+            <a href="#" class="br-banner-link" id="br-banner-link">Saiba mais <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+          </div>
+          <button class="br-banner-close" id="br-banner-close"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <!-- Cards -->
+        <div class="grid-cards-new" id="dashboard-cards"></div>
+
+        <!-- Charts -->
+        <div class="grid-charts-top">
+          <div class="chart-container">
+            <div class="chart-header">Tendência de Vulnerabilidades Críticas</div>
+            <div class="chart-wrapper"><canvas id="incidentTimelineChart"></canvas></div>
+          </div>
+          <div class="chart-container">
+            <div class="chart-header">Distribuição de Severidade</div>
+            <div class="chart-wrapper"><canvas id="attackTypesChart"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Tables -->
+        <div class="dashboard-tables-grid" style="margin-top:16px;">
+          <div class="table-container">
+            <div class="chart-header">Ameaças Recentes</div>
+            <table class="data-table" id="recent-threats-table">
+              <thead>
+                <tr>
+                  <th>Ameaça</th>
+                  <th>Alvo</th>
+                  <th>Severidade</th>
+                  <th>Data</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="table-container side-table">
+            <div class="chart-header" style="text-transform:uppercase; font-size:0.8rem; letter-spacing:1px;">Active Vulnerabilities</div>
+            <div class="vuln-list" id="active-vulns-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: News -->
+      <section id="view-news" class="view">
+        <div>
+          <h2>CyberSecurity News</h2>
+          <p class="text-muted">Agregador em tempo real de notícias sobre segurança da informação</p>
+        </div>
+        <div class="controls-bar">
+          <input type="text" id="news-search" placeholder="Pesquisar notícias..." class="input-field">
+        </div>
+        <div class="grid-news" id="news-container"></div>
+      </section>
+
+      <!-- View: Threats -->
+      <section id="view-threats" class="view">
+        <div>
+          <h2>Threat Feed</h2>
+          <p class="text-muted">Monitoramento de alertas e campanhas maliciosas recentes</p>
+        </div>
+        <div class="controls-bar">
+          <input type="text" id="threats-search" placeholder="Pesquisar por vítima ou grupo..." class="input-field">
+        </div>
+        <div class="data-list" id="threats-container"></div>
+      </section>
+
+      <!-- View: CVEs -->
+      <section id="view-cves" class="view">
+        <div>
+          <h2>Vulnerabilidades</h2>
+          <p class="text-muted">Acompanhamento das vulnerabilidades mais recentes e análises de impacto</p>
+        </div>
+        <div class="controls-bar">
+          <input type="text" id="cves-search" placeholder="Pesquisar CVE ID..." class="input-field">
+        </div>
+        <div class="data-list" id="cves-container"></div>
+      </section>
+
+    </div>
+
+    <!-- Slide-out Panel -->
+    <div id="side-panel" class="side-panel">
+      <button class="close-btn" id="close-panel"><i class="fa-solid fa-xmark"></i></button>
+      <div id="panel-content"></div>
+    </div>
+  </main>
+
+  <script>
+  // ============================================================
+  // MOCK DATA — Protótipo estático para GitHub Pages
+  // ============================================================
+
+  const MOCK = {
+    dashboard: {
+      metrics: {
+        pwnedCount: 13800000000,
+        activeGangs: 68,
+        threats: 1326,
+        vulnerabilities: 562
+      },
+      recentThreats: [
+        { grupo: "LockBit 3.0", vitima: "Saúde Digital S.A.", pais: "BR", data_incidente: "2026-05-18T14:30:00Z" },
+        { grupo: "BlackCat", vitima: "Global Finance Ltd", pais: "US", data_incidente: "2026-05-17T09:10:00Z" },
+        { grupo: "Cl0p", vitima: "Educação Nacional", pais: "BR", data_incidente: "2026-05-16T22:00:00Z" },
+        { grupo: "RansomHub", vitima: "AutoParts Co.", pais: "DE", data_incidente: "2026-05-15T11:45:00Z" },
+        { grupo: "Play", vitima: "TechStart Inc.", pais: "UK", data_incidente: "2026-05-14T16:20:00Z" }
+      ],
+      recentVulnerabilities: [
+        { cve_id: "CVE-2026-30078", cvss: 9.8 },
+        { cve_id: "CVE-2026-5663", cvss: 8.1 },
+        { cve_id: "CVE-2026-5661", cvss: 7.5 },
+        { cve_id: "CVE-2026-5660", cvss: 9.1 },
+        { cve_id: "CVE-2026-3524", cvss: 6.8 },
+        { cve_id: "CVE-2025-44228", cvss: 10.0 }
+      ],
+      chartData: {
+        incidentTimeline: {
+          labels: ["Out", "Nov", "Dez", "Jan", "Fev", "Mar", "Abr", "Mai"],
+          data: [12, 19, 28, 35, 22, 41, 53, 47]
+        },
+        severityDistribution: { data: [142, 203, 176, 41] }
+      }
+    },
+    news: [
+      {
+        titulo: "LockBit 3.0 ataca setor de saúde brasileiro com nova variante de ransomware",
+        fonte: "BleepingComputer",
+        data_publicacao: "2026-05-18T14:00:00Z",
+        resumo: "Uma nova variante do ransomware LockBit 3.0 foi identificada em ataques direcionados a hospitais e clínicas brasileiras. O grupo exige resgates em criptomoedas e ameaça vazar dados de pacientes caso as vítimas não cumpram as exigências.",
+        url: "https://bleepingcomputer.com"
+      },
+      {
+        titulo: "Falha crítica no Apache explorada ativamente por grupos APT",
+        fonte: "The Hacker News",
+        data_publicacao: "2026-05-17T10:30:00Z",
+        resumo: "Pesquisadores de segurança identificaram que grupos de ameaças persistentes avançadas estão explorando ativamente uma vulnerabilidade crítica no servidor Apache, com score CVSS de 9.8. Patches emergenciais foram liberados.",
+        url: "https://thehackernews.com"
+      },
+      {
+        titulo: "BlackCat mira empresas de energia na Europa com ataques sofisticados",
+        fonte: "SecurityWeek",
+        data_publicacao: "2026-05-16T08:15:00Z",
+        resumo: "O grupo de ransomware BlackCat (ALPHV) está conduzindo uma campanha coordenada contra companhias de energia europeias, usando técnicas de dupla extorsão e ameaças de interrupção de infraestrutura crítica.",
+        url: "https://securityweek.com"
+      },
+      {
+        titulo: "CISA emite alerta sobre vulnerabilidades em sistemas ICS industriais",
+        fonte: "CISA",
+        data_publicacao: "2026-05-15T16:45:00Z",
+        resumo: "A Agência de Segurança Cibernética e Infraestrutura dos EUA emitiu alertas urgentes sobre múltiplas vulnerabilidades em sistemas de controle industrial que poderiam permitir acesso não autorizado a infraestruturas críticas.",
+        url: "https://cisa.gov"
+      },
+      {
+        titulo: "Grupo Cl0p explora vulnerabilidade zero-day em software de transferência de arquivos",
+        fonte: "Krebs on Security",
+        data_publicacao: "2026-05-14T12:00:00Z",
+        resumo: "O prolífico grupo Cl0p foi identificado explorando uma vulnerabilidade zero-day em plataformas corporativas de transferência de arquivos, comprometendo centenas de organizações ao redor do mundo em questão de horas.",
+        url: "https://krebsonsecurity.com"
+      },
+      {
+        titulo: "Novo malware bancário brasileiro mira usuários do Pix e aplicativos financeiros",
+        fonte: "Kaspersky BR",
+        data_publicacao: "2026-05-13T09:30:00Z",
+        resumo: "Pesquisadores da Kaspersky descobriram um novo trojan bancário de origem brasileira que utiliza técnicas avançadas de sobreposição de tela para interceptar transações via Pix e roubar credenciais de acesso a bancos digitais.",
+        url: "https://kaspersky.com"
+      }
+    ],
+    threats: [
+      { grupo: "LockBit 3.0", vitima: "Saúde Digital S.A.", pais: "BR", data_incidente: "2026-05-18T14:30:00Z", fonte: "RansomFeed", url: "https://ransomfeed.it" },
+      { grupo: "BlackCat", vitima: "Global Finance Ltd", pais: "US", data_incidente: "2026-05-17T09:10:00Z", fonte: "RansomFeed", url: "https://ransomfeed.it" },
+      { grupo: "Cl0p", vitima: "Educação Nacional", pais: "BR", data_incidente: "2026-05-16T22:00:00Z", fonte: "RansomFeed", url: "https://ransomfeed.it" },
+      { grupo: "RansomHub", vitima: "AutoParts Co.", pais: "DE", data_incidente: "2026-05-15T11:45:00Z", fonte: "RansomFeed", url: "https://ransomfeed.it" },
+      { grupo: "Play", vitima: "TechStart Inc.", pais: "UK", data_incidente: "2026-05-14T16:20:00Z", fonte: "RansomFeed", url: "https://ransomfeed.it" },
+      { grupo: "Akira", vitima: "Logística Express Ltda", pais: "BR", data_incidente: "2026-05-13T08:00:00Z", fonte: "RansomFeed", url: "https://ransomfeed.it" },
+      { grupo: "8Base", vitima: "Construtora Delta", pais: "BR", data_incidente: "2026-05-12T19:30:00Z", fonte: "RansomFeed", url: "https://ransomfeed.it" },
+      { grupo: "Medusa", vitima: "Escola Técnica Nacional", pais: "US", data_incidente: "2026-05-11T13:15:00Z", fonte: "RansomFeed", url: "https://ransomfeed.it" }
+    ],
+    cves: [
+      { id: "CVE-2026-30078", cvss: 9.8, severity: "CRITICAL", publishedAt: "2026-05-18T14:16:22Z", title: "Remote Code Execution in OpenSSL TLS Handler", description: "Uma vulnerabilidade crítica de execução remota de código foi descoberta no processador TLS do OpenSSL. Um atacante não autenticado pode explorar essa falha enviando pacotes especialmente construídos para comprometer sistemas vulneráveis.", recommendation: "Atualizar para OpenSSL 3.3.2 ou superior. Aplicar patches de segurança emergenciais disponibilizados pelos fornecedores.", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-30078" },
+      { id: "CVE-2026-5663", cvss: 8.1, severity: "HIGH", publishedAt: "2026-05-17T14:15:11Z", title: "Privilege Escalation in Linux Kernel netfilter", description: "Uma vulnerabilidade de escalada de privilégios no subsistema netfilter do kernel Linux permite que um usuário local sem privilégios obtenha acesso root através de manipulação de tabelas de firewall.", recommendation: "Atualizar o kernel para versão 6.8.5 ou superior. Desativar módulos netfilter desnecessários como mitigação temporária.", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-5663" },
+      { id: "CVE-2026-5661", cvss: 7.5, severity: "HIGH", publishedAt: "2026-05-16T14:08:19Z", title: "Authentication Bypass in Apache HTTP Server mod_auth", description: "Uma falha no módulo de autenticação do Apache HTTP Server permite que atacantes remotos contornem mecanismos de autenticação básica através de requisições HTTP malformadas com cabeçalhos específicos.", recommendation: "Aplicar o patch de segurança ASF-2026-001. Habilitar autenticação multifator onde possível.", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-5661" },
+      { id: "CVE-2026-5660", cvss: 9.1, severity: "CRITICAL", publishedAt: "2026-05-16T13:45:10Z", title: "SQL Injection in WordPress Core Database Handler", description: "Uma vulnerabilidade de injeção SQL crítica no núcleo do WordPress permite que atacantes não autenticados executem consultas arbitrárias no banco de dados, podendo comprometer toda a instalação.", recommendation: "Atualizar WordPress para versão 6.7.3 ou superior imediatamente. Implementar WAF para filtragem de entrada.", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-5660" },
+      { id: "CVE-2026-3524", cvss: 6.8, severity: "MEDIUM", publishedAt: "2026-05-15T13:17:18Z", title: "Cross-Site Scripting (XSS) in Microsoft Teams Web Client", description: "Uma vulnerabilidade de XSS armazenado no cliente web do Microsoft Teams permite que atacantes injetem scripts maliciosos em mensagens de chat, potencialmente comprometendo sessões de outros usuários.", recommendation: "Aplicar atualizações automáticas do Microsoft Teams. Habilitar Política de Segurança de Conteúdo (CSP) mais restritiva.", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-3524" },
+      { id: "CVE-2025-44228", cvss: 10.0, severity: "CRITICAL", publishedAt: "2026-04-06T15:51:00Z", title: "Log4Shell Extended — RCE via JNDI in Log4j2 Fork", description: "Nova variante da vulnerabilidade Log4Shell descoberta em forks populares do Log4j2 ainda mantidos por terceiros. Permite execução remota de código sem autenticação através de lookups JNDI maliciosos em logs de aplicação.", recommendation: "Substituir bibliotecas afetadas por Log4j2 2.24.3+. Bloquear consultas JNDI externas no firewall de aplicação.", url: "https://nvd.nist.gov/vuln/detail/CVE-2025-44228" }
+    ]
+  };
+
+  // ============================================================
+  // APP
+  // ============================================================
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const navItems = document.querySelectorAll('.nav-item');
+    const views = document.querySelectorAll('.view');
+    const sidePanel = document.getElementById('side-panel');
+    const closePanel = document.getElementById('close-panel');
+    const panelContent = document.getElementById('panel-content');
+
+    let timelineChart = null;
+    let donutChart = null;
+
+    const formatDate = (ds) => {
+      if (!ds) return 'Data Desconhecida';
+      return new Date(ds).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    };
+
+    const formatNumber = (n) => {
+      if (n >= 1e9) return (n / 1e9).toFixed(1) + ' B';
+      if (n >= 1e6) return (n / 1e6).toFixed(1) + ' M';
+      if (n >= 1e3) return (n / 1e3).toFixed(1) + ' K';
+      return n.toLocaleString();
+    };
+
+    // --- Panel close ---
+    closePanel.addEventListener('click', () => sidePanel.classList.remove('open'));
+
+    // --- Notifications ---
+    let notifications = [
+      { title: "Alerta Crítico: Ataque no Brasil detectado", desc: "Vítima: Saúde Digital S.A. | Grupo: LockBit 3.0", dateStr: formatDate("2026-05-18T14:30:00Z") },
+      { title: "Alerta Crítico: Ataque no Brasil detectado", desc: "Vítima: Educação Nacional | Grupo: Cl0p", dateStr: formatDate("2026-05-16T22:00:00Z") },
+      { title: "Alerta Crítico: Ataque no Brasil detectado", desc: "Vítima: Logística Express Ltda | Grupo: Akira", dateStr: formatDate("2026-05-13T08:00:00Z") }
+    ];
+
+    const bellBtn = document.getElementById('bell-btn');
+    const bellBadge = document.getElementById('bell-badge');
+    const notifDropdown = document.getElementById('notif-dropdown');
+    const notifList = document.getElementById('notif-list');
+    const clearNotifsBtn = document.getElementById('clear-notifs');
+
+    const renderNotifs = () => {
+      if (!notifications.length) {
+        notifList.innerHTML = '<p class="text-muted" style="padding:24px;text-align:center;">Nenhuma nova notificação</p>';
+        return;
+      }
+      notifList.innerHTML = notifications.map(n => `
+        <div class="notif-item">
+          <div class="notif-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div class="notif-content">
+            <h5>${n.title}</h5>
+            <p>${n.desc}</p>
+            <span class="notif-time">${n.dateStr}</span>
+          </div>
+        </div>
+      `).join('');
+    };
+
+    bellBadge.style.display = 'block';
+    renderNotifs();
+
+    bellBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      notifDropdown.classList.toggle('open');
+      if (notifDropdown.classList.contains('open')) bellBadge.style.display = 'none';
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!notifDropdown.contains(e.target)) notifDropdown.classList.remove('open');
+    });
+
+    clearNotifsBtn.addEventListener('click', () => {
+      notifications = [];
+      renderNotifs();
+    });
+
+    // Banner
+    document.getElementById('br-banner-close').addEventListener('click', () => {
+      document.getElementById('br-threat-banner').style.display = 'none';
+    });
+
+    document.getElementById('br-banner-link').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelector('[data-target="view-threats"]').click();
+      document.getElementById('br-threat-banner').style.display = 'none';
+    });
+
+    // --- Nav ---
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        navItems.forEach(n => n.classList.remove('active'));
+        views.forEach(v => v.classList.remove('active'));
+        item.classList.add('active');
+        const target = item.getAttribute('data-target');
+        document.getElementById(target).classList.add('active');
+
+        if (target === 'view-dashboard') loadDashboard();
+        if (target === 'view-news') loadNews();
+        if (target === 'view-threats') loadThreats();
+        if (target === 'view-cves') loadCVEs();
+      });
+    });
+
+    // --- Dashboard ---
+    function loadDashboard() {
+      const { metrics, recentThreats, recentVulnerabilities, chartData } = MOCK.dashboard;
+
+      // Cards
+      document.getElementById('dashboard-cards').innerHTML = `
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-card-title" style="text-transform:uppercase; text-shadow: 1px 1px 2px rgba(255,3,3,1);"><b>Contas Vazadas</b></span>
+          </div>
+          <div class="stat-card-value">${formatNumber(metrics.pwnedCount)}</div>
+          <div class="stat-trend"><br>
+            <svg width="40" height="15" viewBox="0 0 40 15" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-top:5px; margin-left:auto; display:block;">
+              <path d="M1 10C2 10 4 12 7 12C10 12 12 5 15 5C18 5 20 12 23 12C26 12 28 8 31 8C34 8 36 10 39 10" stroke="#58a6ff" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-card-title" style="text-transform:uppercase; text-shadow: 1px 1px 2px rgba(250,16,16,1);"><b>Grupos Ativos</b> <i class="fa-solid fa-users" style="color:var(--accent); margin-left:4px;"></i></span>
+          </div>
+          <div class="stat-card-value">${metrics.activeGangs}</div>
+          <div class="stat-trend"><br></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-card-title" style="text-transform:uppercase; text-shadow: 1px 1px 2px rgba(255,5,0,1);"><b>Total de Ameaças</b> <i class="fa-solid fa-triangle-exclamation" style="color:var(--accent); margin-left:4px;"></i></span>
+          </div>
+          <div class="stat-card-value">${metrics.threats.toLocaleString()}</div>
+          <div class="stat-trend"><br></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-card-title" style="text-transform:uppercase; text-shadow: 1px 1px 2px rgba(255,5,0,1);"><b>Vulnerabilidades</b> <i class="fa-solid fa-shield-halved" style="color:var(--accent); margin-left:4px;"></i></span>
+          </div>
+          <div class="stat-card-value">${metrics.vulnerabilities.toLocaleString()}</div>
+          <div class="stat-trend"><br></div>
+        </div>
+      `;
+
+      // Charts
+      if (timelineChart) timelineChart.destroy();
+      if (donutChart) donutChart.destroy();
+
+      const ctxLine = document.getElementById('incidentTimelineChart').getContext('2d');
+      let gradientRed = ctxLine.createLinearGradient(0, 0, 0, 300);
+      gradientRed.addColorStop(0, 'rgba(248,81,73,0.4)');
+      gradientRed.addColorStop(1, 'rgba(248,81,73,0.0)');
+
+      timelineChart = new Chart(ctxLine, {
+        type: 'line',
+        data: {
+          labels: chartData.incidentTimeline.labels,
+          datasets: [{
+            label: 'Vulnerabilidades Críticas',
+            data: chartData.incidentTimeline.data,
+            borderColor: '#f85149',
+            backgroundColor: gradientRed,
+            borderWidth: 2,
+            pointRadius: 4,
+            pointBackgroundColor: '#f85149',
+            pointBorderColor: '#1c1e1d',
+            pointHoverRadius: 6,
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#8b949e', font: { size: 9 } } },
+            y: { min: 0, suggestedMax: 60, grid: { color: '#30363d', borderDash: [5,5] }, ticks: { color: '#8b949e', stepSize: 20, font: { size: 10 } } }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+
+      const ctxDonut = document.getElementById('attackTypesChart').getContext('2d');
+      donutChart = new Chart(ctxDonut, {
+        type: 'doughnut',
+        data: {
+          labels: ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'],
+          datasets: [{
+            data: chartData.severityDistribution.data,
+            backgroundColor: ['#f85149', '#e3a14e', '#58a6ff', '#8b949e'],
+            borderWidth: 1,
+            borderColor: '#1c1e1d'
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          cutout: '65%',
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: { color: '#c9d1d9', usePointStyle: true, boxWidth: 8, font: { size: 10 } }
+            }
+          }
+        }
+      });
+
+      // Tables
+      const tbody = document.querySelector('#recent-threats-table tbody');
+      tbody.innerHTML = recentThreats.map((t, i) => {
+        let sev = 'HIGH', cls = 'warning';
+        if (i % 3 === 0) { sev = 'CRITICAL'; cls = 'danger'; }
+        else if (i % 2 !== 0 && i !== 1) { sev = 'MEDIUM'; cls = 'neutral'; }
+        else if (i === 1) { sev = 'LOW'; cls = 'neutral'; }
+        const d = t.data_incidente ? t.data_incidente.split('T')[0] : '';
+        return `<tr>
+          <td>${t.grupo || t.vitima}</td>
+          <td>${t.vitima || t.pais}</td>
+          <td><span class="badge ${cls}" style="text-transform:uppercase; font-size:0.65rem;">${sev}</span></td>
+          <td>${d}</td>
+        </tr>`;
+      }).join('');
+
+      const vulnList = document.getElementById('active-vulns-list');
+      vulnList.innerHTML = recentVulnerabilities.map((v, i) => {
+        const score = Math.floor(Math.random() * 100) + 120 + (10 - i) * 10;
+        return `<div class="vuln-item">
+          <div style="font-size:0.85rem; color:#c9d1d9;">
+            <span style="color:#e3a14e; margin-right:8px;">•</span>${v.cve_id}
+          </div>
+          <div style="font-size:0.85rem; color:#58a6ff; font-weight:500;">${score}</div>
+        </div>`;
+      }).join('');
+    }
+
+    // --- News ---
+    function loadNews() {
+      const container = document.getElementById('news-container');
+      if (container.children.length > 0) return;
+
+      container.innerHTML = MOCK.news.map((item, index) => `
+        <div class="list-item" data-index="${index}">
+          <h3>${item.titulo}</h3>
+          <div class="item-meta">
+            <span class="source">${item.fonte}</span>
+            <span><i class="fa-regular fa-calendar" style="margin-right:4px;"></i>${formatDate(item.data_publicacao)}</span>
+          </div>
+          <p class="item-desc">${item.resumo.substring(0, 150)}...</p>
+          <div class="read-more">Read more <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.8em;"></i></div>
+        </div>
+      `).join('');
+
+      container.querySelectorAll('.list-item').forEach(card => {
+        card.addEventListener('click', () => {
+          const news = MOCK.news[card.getAttribute('data-index')];
+          panelContent.innerHTML = `
+            <div class="item-header">
+              <span class="badge neutral"><i class="fa-solid fa-rss"></i> ${news.fonte}</span>
+              <span class="item-date">${formatDate(news.data_publicacao)}</span>
+            </div>
+            <h2 class="panel-title">${news.titulo}</h2>
+            <div class="ai-summary">
+              <h4><i class="fa-solid fa-wand-magic-sparkles"></i> AI Summary</h4>
+              <p>${news.resumo}</p>
+            </div>
+            <div style="margin-top:24px;">
+              <h3 style="margin-bottom:12px; font-size:1.1rem;">Full Article Link</h3>
+              <p class="text-muted">Acesse a fonte original para ler a notícia completa diretamente do publicador.</p>
+              <a href="${news.url}" target="_blank" class="btn-primary">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> View Original Source
+              </a>
+            </div>
+          `;
+          sidePanel.classList.add('open');
+        });
+      });
+
+      document.getElementById('news-search').addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        container.querySelectorAll('.list-item').forEach(item => {
+          item.style.display = item.innerText.toLowerCase().includes(term) ? '' : 'none';
+        });
+      });
+    }
+
+    // --- Threats ---
+    function loadThreats() {
+      const container = document.getElementById('threats-container');
+      if (container.children.length > 0) return;
+
+      container.innerHTML = MOCK.threats.map((item, index) => {
+        const isBR = ['br', 'brazil', 'brasil'].includes((item.pais || '').toLowerCase());
+        const alertIcon = isBR ? '<span style="color:var(--danger); margin-left:8px;"><i class="fa-solid fa-triangle-exclamation fa-beat-fade"></i></span>' : '';
+        const baseStyle = isBR
+          ? `style="border: 2px solid var(--danger); border-radius:12px; padding:24px; position:relative; box-shadow:0 0 15px rgba(248,81,73,0.4); background-color:rgba(248,81,73,0.05);"`
+          : `style="padding:24px; position:relative;"`;
+        return `
+          <div class="list-item" data-index="${index}" ${baseStyle}>
+            <div class="item-header" style="margin-bottom:24px; align-items:flex-start;">
+              <h3 style="color:${isBR ? 'var(--danger)' : 'var(--text-bright)'}; text-transform:uppercase; margin-bottom:0; font-size:1.1rem; letter-spacing:0.5px;">
+                ${item.grupo || item.vitima || 'AMEAÇA REGISTRADA'} ${alertIcon}
+              </h3>
+              <span class="item-date">${formatDate(item.data_incidente)}</span>
+            </div>
+            <p class="item-desc" style="margin-bottom:32px; font-size:0.9rem; color:var(--text-muted); line-height:1.8;">
+              Vítima: ${item.vitima || 'Desconhecida'}<br>
+              País: <strong style="color:${isBR ? 'var(--danger)' : 'inherit'}">${item.pais || 'Desconhecido'}</strong>
+            </p>
+            <div class="item-footer" style="gap:12px;">
+              <span class="badge danger" style="padding:6px 14px; background-color:rgba(248,81,73,0.15); border:1px solid rgba(248,81,73,0.3);"><i class="fa-solid fa-skull-crossbones"></i> Ransomware</span>
+              <span class="badge neutral" style="padding:6px 14px; background-color:rgba(139,148,158,0.15); border:1px solid rgba(139,148,158,0.3);"><i class="fa-solid fa-file-lines"></i> ${item.fonte}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.querySelectorAll('.list-item').forEach(card => {
+        card.addEventListener('click', () => {
+          const threat = MOCK.threats[card.getAttribute('data-index')];
+          const isBR = ['br', 'brazil', 'brasil'].includes((threat.pais || '').toLowerCase());
+          panelContent.innerHTML = `
+            <div class="item-header">
+              <span class="badge danger"><i class="fa-solid fa-skull-crossbones"></i> Ransomware</span>
+              <span class="item-date">${formatDate(threat.data_incidente)}</span>
+            </div>
+            <h2 class="panel-title">Ataque: ${threat.grupo || threat.vitima || 'Ameaça'}</h2>
+            <div class="ai-summary" style="border-color:rgba(248,81,73,0.3); background:linear-gradient(145deg,rgba(248,81,73,0.1) 0%,transparent 100%);">
+              <h4 style="color:var(--danger);"><i class="fa-solid fa-robot"></i> System Analysis</h4>
+              <p>Foi identificado um novo ataque de ransomware.<br>
+              A vítima afetada foi identificada como <strong>${threat.vitima || 'Desconhecida'}</strong>, na região de <strong>${threat.pais || 'Desconhecida'}</strong>.</p><br>
+              ${threat.grupo ? `<p>O grupo responsável: <strong style="text-transform:uppercase;">${threat.grupo}</strong>.</p><br>` : ''}
+              <p><strong>🔎 Detalhes Técnicos do Evento:</strong></p><br>
+              <p><strong>👾 Grupo:</strong> ${threat.grupo || 'Desconhecido'}</p><br>
+              <p><strong>🏢 Vítima:</strong> ${threat.vitima || 'Desconhecida'}</p><br>
+              <p><strong>📅 Data do Incidente:</strong> ${formatDate(threat.data_incidente)}</p><br>
+              <p><strong>🌎 País:</strong> ${threat.pais || 'Desconhecido'}</p>
+            </div>
+            <div style="margin-top:24px;">
+              <h3 style="margin-bottom:12px; font-size:1.1rem;">Relatório da Fonte</h3>
+              <p class="text-muted">Acesse a fonte original da API que reportou este evento.</p>
+              <a href="${threat.url}" target="_blank" class="btn-primary" style="background-color:var(--danger); color:white;">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Ver Origem
+              </a>
+            </div>
+          `;
+          sidePanel.classList.add('open');
+        });
+      });
+
+      document.getElementById('threats-search').addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        container.querySelectorAll('.list-item').forEach(item => {
+          item.style.display = item.innerText.toLowerCase().includes(term) ? '' : 'none';
+        });
+      });
+    }
+
+    // --- CVEs ---
+    function loadCVEs() {
+      const container = document.getElementById('cves-container');
+      if (container.children.length > 0) return;
+
+      container.innerHTML = MOCK.cves.map((item, index) => {
+        let color = '#8b949e', bg = 'rgba(139,148,158,0.1)', border = '1px solid rgba(139,148,158,0.3)', icon = 'fa-solid fa-circle-info', label = item.severity;
+        if (item.cvss >= 9.0) { color = '#f85149'; bg = 'rgba(248,81,73,0.1)'; border = '1px solid rgba(248,81,73,0.3)'; icon = 'fa-solid fa-circle-exclamation'; label = 'CRITICAL'; }
+        else if (item.cvss >= 7.0) { color = '#f85149'; bg = 'rgba(248,81,73,0.1)'; border = '1px solid rgba(248,81,73,0.3)'; icon = 'fa-solid fa-circle-exclamation'; label = 'HIGH'; }
+        else if (item.cvss >= 4.0) { color = '#d29922'; bg = 'rgba(210,153,34,0.1)'; border = '1px solid rgba(210,153,34,0.3)'; icon = 'fa-solid fa-triangle-exclamation'; label = 'MEDIUM'; }
+
+        return `
+          <div class="list-item" data-index="${index}" style="display:flex; flex-direction:row; justify-content:space-between; align-items:center;">
+            <div style="display:flex; flex-direction:column; gap:16px;">
+              <h3 style="color:var(--text-bright); font-size:1.2rem; margin:0; font-weight:600;">${item.id}</h3>
+              <span style="background-color:${bg}; color:${color}; padding:4px 12px; border-radius:12px; font-size:0.75rem; font-weight:bold; border:${border}; display:inline-flex; align-items:center; width:fit-content; text-transform:uppercase;">
+                <i class="${icon}" style="margin-right:4px;"></i> ${label} (CVSS: ${item.cvss})
+              </span>
+            </div>
+            <div style="display:flex; align-items:center;">
+              <span style="color:var(--text-muted); font-size:0.95rem; text-align:right; white-space:nowrap;">${formatDate(item.publishedAt)}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.querySelectorAll('.list-item').forEach(card => {
+        card.addEventListener('click', () => {
+          const cve = MOCK.cves[card.getAttribute('data-index')];
+          let color = '#8b949e', cvssLabel = cve.severity, badgeClass = 'neutral';
+          if (cve.cvss >= 9.0) { color = 'var(--danger)'; cvssLabel = 'CRITICAL'; badgeClass = 'danger'; }
+          else if (cve.cvss >= 7.0) { color = 'var(--danger)'; cvssLabel = 'HIGH'; badgeClass = 'danger'; }
+          else if (cve.cvss >= 4.0) { color = 'var(--warning)'; cvssLabel = 'MEDIUM'; badgeClass = 'warning'; }
+
+          panelContent.innerHTML = `
+            <div class="item-header">
+              <span class="badge ${badgeClass}"><i class="fa-solid fa-shield-virus"></i> ${cvssLabel}</span>
+              <span class="item-date">${formatDate(cve.publishedAt)}</span>
+            </div>
+            <h2 class="panel-title" style="margin-bottom:5px;">${cve.id}</h2>
+            <div class="ai-summary" style="border-color:rgba(88,166,255,0.3); background:linear-gradient(145deg,rgba(88,166,255,0.1) 0%,transparent 100%);">
+              <h4 style="color:var(--accent); margin-bottom:15px;"><i class="fa-solid fa-list-ul"></i> Detalhes da Vulnerabilidade</h4>
+              <div style="display:flex; flex-direction:column; gap:12px;">
+                <div>
+                  <strong style="color:var(--text-muted); font-size:0.85rem; text-transform:uppercase;">Título</strong>
+                  <p style="margin-top:2px; color:var(--text-bright);">${cve.title}</p>
+                </div>
+                <div>
+                  <strong style="color:var(--text-muted); font-size:0.85rem; text-transform:uppercase;">CVSS Score: <strong style="color:${color}; font-weight:bold; font-size:1rem;">${cve.cvss}</strong></strong>
+                </div>
+                <div>
+                  <strong style="color:var(--text-muted); font-size:0.85rem; text-transform:uppercase;">Severidade: <span class="badge ${badgeClass}" style="padding:4px 8px; font-size:0.75rem;"><strong>${cvssLabel}</strong></span></strong>
+                </div>
+                <div style="margin-top:8px;">
+                  <strong style="color:var(--text-muted); font-size:0.85rem; text-transform:uppercase;">Descrição</strong>
+                  <p style="margin-top:6px; color:var(--text-bright); line-height:1.6;">${cve.description}</p>
+                </div>
+                <div style="margin-top:8px;">
+                  <strong style="color:var(--accent);"><i class="fa-solid fa-list-ul"></i> Recomendações de Segurança</strong>
+                  <p style="margin-top:6px; color:var(--text-bright); line-height:1.6;">${cve.recommendation}</p>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:24px;">
+              <h3 style="margin-bottom:12px; font-size:1.1rem;">Fonte Original</h3>
+              <p class="text-muted">Acesse a referência para verificar os patches e mitigações na NVD.</p>
+              <a href="${cve.url}" target="_blank" class="btn-primary">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Ver Detalhes Originais
+              </a>
+            </div>
+          `;
+          sidePanel.classList.add('open');
+        });
+      });
+
+      document.getElementById('cves-search').addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        container.querySelectorAll('.list-item').forEach(item => {
+          item.style.display = item.innerText.toLowerCase().includes(term) ? '' : 'none';
+        });
+      });
+    }
+
+    // Init
+    loadDashboard();
+  });
+  </script>
+</body>
+</html>
