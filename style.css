@@ -555,7 +555,7 @@ h2 { margin-bottom: 8px; }
   .search-box input { width: 100%; }
   .live-indicator { margin-right: auto; }
   .content-area { padding: 16px; overflow-y: visible; }
-  .notification-dropdown .dropdown-menu { width: calc(100vw - 32px); right: 0; left: auto; max-width: 100%; }
+  .notification-dropdown .dropdown-menu { position: fixed; top: 110px; left: 50%; transform: translateX(-50%); width: calc(100vw - 32px); max-width: 400px; z-index: 1000; }
 }
 
 @media (max-width: 640px) {

@@ -457,13 +457,13 @@ document.addEventListener('DOMContentLoaded', () => {
       return `
         <div class="list-item" data-index="${index}" style="display:flex; flex-direction:row; justify-content:space-between; align-items:center;">
           <div style="display:flex; flex-direction:column; gap:16px;">
-            <h3 style="color:var(--text-bright); font-size:1.2rem; margin:0; font-weight:600;">${item.id}</h3>
-            <span style="background-color:${bg}; color:${color}; padding:4px 12px; border-radius:12px; font-size:0.75rem; font-weight:bold; border:${border}; display:inline-flex; align-items:center; width:fit-content; text-transform:uppercase;">
+            <h3 style="color:var(--text-bright); font-size:1.2rem; margin:0; font-weight:600; white-space:nowrap;">${item.id}</h3>
+            <span style="background-color:${bg}; color:${color}; padding:4px 12px; border-radius:12px; font-size:0.75rem; font-weight:bold; border:${border}; display:inline-flex; align-items:center; width:fit-content; text-transform:uppercase; white-space:nowrap;">
               <i class="${icon}" style="margin-right:4px;"></i> ${label} (CVSS: ${item.cvss})
             </span>
           </div>
           <div style="display:flex; align-items:center;">
-            <span style="color:var(--text-muted); font-size:0.95rem; text-align:right; white-space:nowrap;">${formatDate(item.publishedAt)}</span>
+            <span style="color:var(--text-muted); font-size:0.65rem; opacity:0.6; text-align:right; white-space:nowrap;">${formatDate(item.publishedAt)}</span>
           </div>
         </div>
       `;
