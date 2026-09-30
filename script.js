@@ -11,11 +11,11 @@ const MOCK = {
       vulnerabilities: 0
     },
     recentThreats: [
-      { grupo: "LockBit 3.0", vitima: "Saúde Digital S.A.", pais: "BR", data_incidente: "2026-05-18T14:30:00Z" },
-      { grupo: "BlackCat", vitima: "Global Finance Ltd", pais: "US", data_incidente: "2026-05-17T09:10:00Z" },
-      { grupo: "Cl0p", vitima: "Educação Nacional", pais: "BR", data_incidente: "2026-05-16T22:00:00Z" },
-      { grupo: "RansomHub", vitima: "AutoParts Co.", pais: "DE", data_incidente: "2026-05-15T11:45:00Z" },
-      { grupo: "Play", vitima: "TechStart Inc.", pais: "UK", data_incidente: "2026-05-14T16:20:00Z" }
+      { grupo: "NULL", vitima: "NULL", pais: "NULL", data_incidente: "NULL" },
+      { grupo: "NULL", vitima: "NULL", pais: "NULL", data_incidente: "NULL" },
+      { grupo: "NULL", vitima: "NULL", pais: "NULL", data_incidente: "NULL" },
+      { grupo: "NULL", vitima: "NULL", pais: "NULL", data_incidente: "NULL" },
+      { grupo: "NULL", vitima: "NULL", pais: "NULL", data_incidente: "NULL" }
     ],
     recentVulnerabilities: [
       { cve_id: "CVE-0000-0000", cvss: 0 },
