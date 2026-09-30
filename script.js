@@ -5,10 +5,10 @@
 const MOCK = {
   dashboard: {
     metrics: {
-      pwnedCount: 13800000000,
-      activeGangs: 68,
-      threats: 1326,
-      vulnerabilities: 562
+      pwnedCount: 0,
+      activeGangs: 0,
+      threats: 0,
+      vulnerabilities: 0
     },
     recentThreats: [
       { grupo: "LockBit 3.0", vitima: "Saúde Digital S.A.", pais: "BR", data_incidente: "2026-05-18T14:30:00Z" },
@@ -18,19 +18,19 @@ const MOCK = {
       { grupo: "Play", vitima: "TechStart Inc.", pais: "UK", data_incidente: "2026-05-14T16:20:00Z" }
     ],
     recentVulnerabilities: [
-      { cve_id: "CVE-2026-30078", cvss: 9.8 },
-      { cve_id: "CVE-2026-5663", cvss: 8.1 },
-      { cve_id: "CVE-2026-5661", cvss: 7.5 },
-      { cve_id: "CVE-2026-5660", cvss: 9.1 },
-      { cve_id: "CVE-2026-3524", cvss: 6.8 },
-      { cve_id: "CVE-2025-44228", cvss: 10.0 }
+      { cve_id: "CVE-0000-0000", cvss: 0 },
+      { cve_id: "CVE-0000-0000", cvss: 0 },
+      { cve_id: "CVE-0000-0000", cvss: 0 },
+      { cve_id: "CVE-0000-0000", cvss: 0 },
+      { cve_id: "CVE-0000-0000", cvss: 0 },
+      { cve_id: "CVE-0000-0000", cvss: 0 }
     ],
     chartData: {
       incidentTimeline: {
         labels: ["Out", "Nov", "Dez", "Jan", "Fev", "Mar", "Abr", "Mai"],
-        data: [12, 19, 28, 35, 22, 41, 53, 47]
+        data: [0, 0, 0, 0, 0, 0, 0, 0]
       },
-      severityDistribution: { data: [142, 203, 176, 41] }
+      severityDistribution: { data: [0, 0, 0, 0] }
     }
   },
   news: [
